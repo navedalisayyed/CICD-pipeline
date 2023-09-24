@@ -1,4 +1,4 @@
-@Library('jenkins_shared_lib') _
+@Library('my-shared-library') _
 pipeline {
     
     agent any
@@ -9,10 +9,10 @@ pipeline {
                 gitCheckout{
                     branch: "main",
                     url: "https://github.com/navedalisayyed/CICD-pipeline.git"
-                  }
+                }
                    
 
-                }
+            }
             
               
         }
