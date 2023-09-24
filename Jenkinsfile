@@ -7,7 +7,7 @@ pipeline {
         stage ("Git checkout"){
             steps{
                 gitCheckout{
-                    branch: "main",
+                    branch: "main"
                     url: "https://github.com/navedalisayyed/CICD-pipeline.git"
                   }
                    
