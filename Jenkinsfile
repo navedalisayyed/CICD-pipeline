@@ -7,8 +7,9 @@ pipeline {
         choice(name:'action',choices:'create\ndelete',description:'choose create/destroy')
     }
     stages{
-        when { expression { params.action == 'create'}}
+        
         stage ("Git checkout"){
+            when { expression { params.action == 'create'}}
             steps{
                 gitCheckout(
                     branch: "main",
@@ -20,7 +21,7 @@ pipeline {
 
         }
         stage ("MVN unit test"){
-        when { expression { params.action == 'create'}}    
+            when { expression { params.action == 'create'}}    
             steps{
                script{
                   mvnTest()
@@ -30,7 +31,7 @@ pipeline {
 
         }
         stage ("MVN integration test"){
-        when { expression { params.action == 'create'}}    
+            when { expression { params.action == 'create'}}    
             steps{
                script{
                   mvnIntegrationTest()
@@ -41,7 +42,7 @@ pipeline {
               
         }
         stage ("Static code analysis:sonarqube"){
-        when { expression { params.action == 'create'}}    
+            when { expression { params.action == 'create'}}    
             steps{
                script{
                   staticCodeAnalysis()
