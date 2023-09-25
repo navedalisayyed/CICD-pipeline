@@ -13,14 +13,23 @@ pipeline {
                    
 
             }
-            
-              
+
         }
         stage ("MVN unit test"){
             steps{
-              script{
-                mvnTest()
-              }
+               script{
+                  mvnTest()
+               }
+
+            }
+            
+              
+        }
+        stage ("MVN integration test"){
+            steps{
+               script{
+                  mvninetgrationTest()
+               }
 
             }
             
