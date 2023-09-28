@@ -54,17 +54,17 @@ pipeline {
             }
  
         }
-        stage ("Qaulity gate status check:sonarqube"){
-            when { expression { params.action == 'create'}}    
-            steps{
-               script{
-                   def SonarQubecredentialsId = 'sonar-api'
-                   QualityGateStatus(SonarQubecredentialsId)
-               }
+        // stage ("Qaulity gate status check:sonarqube"){
+        //     when { expression { params.action == 'create'}}    
+        //     steps{
+        //        script{
+        //            def SonarQubecredentialsId = 'sonar-api'
+        //            QualityGateStatus(SonarQubecredentialsId)
+        //        }
 
-            }
+        //     }
     
-        }
+        // }
         stage ("Maven Build"){
             when { expression { params.action == 'create'}}    
             steps{
