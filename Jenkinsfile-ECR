@@ -9,6 +9,10 @@ pipeline {
         string(name: 'Region', description: "Region of ECR", defaultValue: 'ap-south-1')
         string(name: 'ECR_REPO_NAME', description: "name of the ECR", defaultValue: 'navedali')
     }
+    environment{
+        ACCESS_KEY = credentials {'AWS_ACCESS_KEY_ID'}
+        SECRET_KEY = credentials {'AWS_SECRET_KEY_ID'}
+    }
     stages{
         
         stage ("Git checkout"){
@@ -23,26 +27,26 @@ pipeline {
             }
 
         }
-        stage ("MVN unit test"){
-            when { expression { params.action == 'create'}}    
-            steps{
-               script{
-                  mvnTest()
-               }
+        // stage ("MVN unit test"){
+        //     when { expression { params.action == 'create'}}    
+        //     steps{
+        //        script{
+        //           mvnTest()
+        //        }
 
-            }
+        //     }
 
-        }
-        stage ("MVN integration test"){
-            when { expression { params.action == 'create'}}    
-            steps{
-               script{
-                  mvnIntegrationTest()
-               }
+        // }
+        // stage ("MVN integration test"){
+        //     when { expression { params.action == 'create'}}    
+        //     steps{
+        //        script{
+        //           mvnIntegrationTest()
+        //        }
 
-            }
+        //     }
   
-        }
+        // }
         // stage ("Static code analysis:sonarqube"){
         //     when { expression { params.action == 'create'}}    
         //     steps{
@@ -65,36 +69,52 @@ pipeline {
         //     }
     
         // }
-        stage ("Maven Build"){
-            when { expression { params.action == 'create'}}    
-            steps{
-               script{
+        // stage ("Maven Build"){
+        //     when { expression { params.action == 'create'}}    
+        //     steps{
+        //        script{
 
-                   mvnBuild()
-               }
+        //            mvnBuild()
+        //        }
 
-            }
+        //     }
        
-        }
-        stage ("Docker Image Build:ECR"){
-            when { expression { params.action == 'create'}}    
-            steps{
-               script{
+        // }
+        // stage ("Docker Image Build:ECR"){
+        //     when { expression { params.action == 'create'}}    
+        //     steps{
+        //        script{
 
-                   dockerBuild("${params.aws_account_id}","${params.Region}","${params.ECR_REPO_NAME}")
-               }
+        //            dockerBuild("${params.aws_account_id}","${params.Region}","${params.ECR_REPO_NAME}")
+        //        }
 
-            }
+        //     }
        
-        }
-        stage ("Docker Image Push:ECR"){
-            when { expression { params.action == 'create'}}    
+        // }
+        // stage ("Docker Image Push:ECR"){
+        //     when { expression { params.action == 'create'}}    
+        //     steps{
+        //        script{
+
+        //            dockerImagePush("${params.aws_account_id}","${params.Region}","${params.ECR_REPO_NAME}")
+        //        }
+
+        //     }
+        // }
+        stage('Create EKS Cluster : Terraform'){
+            when { expression {  params.action == 'create' } }
             steps{
-               script{
+                script{
 
-                   dockerImagePush("${params.aws_account_id}","${params.Region}","${params.ECR_REPO_NAME}")
-               }
-
+                    dir('eks_module') {
+                      sh """
+                          
+                          terraform init 
+                          terraform plan -var 'access_key=$ACCESS_KEY' -var 'secret_key=$SECRET_KEY' -var 'region=${params.Region}' --var-file=./config/terraform.tfvars
+                          terraform apply -var 'access_key=$ACCESS_KEY' -var 'secret_key=$SECRET_KEY' -var 'region=${params.Region}' --var-file=./config/terraform.tfvars --auto-approve
+                      """
+                  }
+                }
             }
         }
     }     
